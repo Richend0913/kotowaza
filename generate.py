@@ -1098,16 +1098,42 @@ def generate_proverb_page(p, all_proverbs):
 
 
 def generate_index(all_proverbs):
-    cards = []
-    for p in all_proverbs:
+    def card_html(p):
         s = slug(p["title"])
         cat_slug = CATEGORIES.get(p["category"], "other")
-        cards.append(f"""<a href="proverbs/{s}.html" class="proverb-card" data-category="{cat_slug}">
-    <div class="card-title">{p["title"]}</div>
+        return f"""<a href="proverbs/{s}.html" class="proverb-card" data-category="{cat_slug}">
+    <h3 class="card-title">{p["title"]}</h3>
     <div class="card-reading">{p["reading"]}</div>
     <div class="card-meaning">{p["meaning"][:80]}...</div>
     <span class="card-cat">{p["category"]}</span>
-</a>""")
+</a>"""
+
+    # Group cards into per-category <section>s with <h2> headings.
+    # Section ids (category-<slug>) match the anchors detail pages link to.
+    sections = []
+    grouped = set()
+    for cat_ja, cat_en in CATEGORIES.items():
+        members = [p for p in all_proverbs if p["category"] == cat_ja]
+        if not members:
+            continue
+        grouped.update(id(p) for p in members)
+        cards = "".join(card_html(p) for p in members)
+        sections.append(f"""<section class="category-section" id="category-{cat_en}" aria-labelledby="category-{cat_en}-title">
+    <h2 class="category-title" id="category-{cat_en}-title">{cat_ja}のことわざ<span class="count-badge">({len(members)})</span></h2>
+    <div class="proverb-grid">
+    {cards}
+    </div>
+</section>""")
+    others = [p for p in all_proverbs if id(p) not in grouped]
+    if others:
+        cards = "".join(card_html(p) for p in others)
+        sections.append(f"""<section class="category-section" id="category-other" aria-labelledby="category-other-title">
+    <h2 class="category-title" id="category-other-title">その他のことわざ<span class="count-badge">({len(others)})</span></h2>
+    <div class="proverb-grid">
+    {cards}
+    </div>
+</section>""")
+    sections_html = "\n\n".join(sections)
 
     cat_buttons = ['<button class="cat-btn active" data-cat="all">すべて</button>']
     for cat_ja, cat_en in CATEGORIES.items():
@@ -1165,6 +1191,7 @@ def generate_index(all_proverbs):
     </div>
 </header>
 
+<main>
 <div class="hero">
     <h1>ことわざ辞典</h1>
     <p>日本のことわざの意味・由来・使い方を例文付きで詳しく解説。{len(all_proverbs)}のことわざを収録しています。</p>
@@ -1179,17 +1206,24 @@ def generate_index(all_proverbs):
 
 {AD_UNIT}
 
-<div class="proverb-grid" id="proverbGrid">
-    {"".join(cards)}
-</div>
+{sections_html}
 
 {AD_UNIT}
+</main>
 
 <footer class="site-footer">
     <p>&copy; 2026 ことわざ辞典 All Rights Reserved.</p>
 </footer>
 
 <script>
+// Hide category sections whose cards are all hidden (search/filter)
+function syncSections() {{
+    document.querySelectorAll('.category-section').forEach(sec => {{
+        const anyVisible = Array.from(sec.querySelectorAll('.proverb-card')).some(c => c.style.display !== 'none');
+        sec.style.display = anyVisible ? '' : 'none';
+    }});
+}}
+
 // Search
 document.getElementById('searchInput').addEventListener('input', function() {{
     const query = this.value.toLowerCase();
@@ -1200,6 +1234,7 @@ document.getElementById('searchInput').addEventListener('input', function() {{
         const match = title.includes(query) || reading.includes(query) || meaning.includes(query);
         card.style.display = match ? '' : 'none';
     }});
+    syncSections();
 }});
 
 // Category filter
@@ -1215,6 +1250,7 @@ document.querySelectorAll('.cat-btn').forEach(btn => {{
                 card.style.display = 'none';
             }}
         }});
+        syncSections();
     }});
 }});
 </script>
