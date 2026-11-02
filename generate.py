@@ -7,11 +7,8 @@ import re
 from datetime import datetime
 
 SITE_URL = "https://richend0913.github.io/kotowaza"
-ADSENSE = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6327505164684489" crossorigin="anonymous"></script>'
-AD_UNIT = """<div class="ad-space">
-<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6327505164684489" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-</div>"""
+ADSENSE = ''
+AD_UNIT = """"""
 
 CATEGORIES = {
     "動物": "animal",
