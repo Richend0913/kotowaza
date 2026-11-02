@@ -8,7 +8,25 @@ from datetime import datetime
 
 SITE_URL = "https://richend0913.github.io/kotowaza"
 ADSENSE = ''
+GA_TAG = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-63VB4HT3T2"></script>\n<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag(\'js\',new Date());gtag(\'config\',\'G-63VB4HT3T2\',{page_area:\'kotowaza\'});</script>'
 AD_UNIT = """"""
+
+AMAZON_TAG = "okuritegift-22"
+
+
+def _amazon_search_url(query):
+    from urllib.parse import quote_plus
+    return f"https://www.amazon.co.jp/s?k={quote_plus(query)}&tag={AMAZON_TAG}"
+
+
+BOOK_CARD = f"""<div class="section-card book-card">
+        <p style="font-size:0.75rem;color:#888;margin:0 0 4px;">広告・PR</p>
+        <h2>本でもっと詳しく</h2>
+        <ul>
+            <li><a href="{_amazon_search_url('ことわざ 辞典')}" rel="nofollow sponsored noopener" target="_blank">ことわざ辞典（Amazonで探す）</a></li>
+            <li><a href="{_amazon_search_url('国語辞典')}" rel="nofollow sponsored noopener" target="_blank">国語辞典（Amazonで探す）</a></li>
+        </ul>
+    </div>"""
 
 CATEGORIES = {
     "動物": "animal",
@@ -979,6 +997,7 @@ def generate_proverb_page(p, all_proverbs):
     html = f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
+{GA_TAG}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{p["title"]}の意味・使い方・例文 | ことわざ辞典</title>
@@ -1065,6 +1084,8 @@ def generate_proverb_page(p, all_proverbs):
     {AD_UNIT}
 
     {related_html}
+
+    {BOOK_CARD}
 </main>
 
 <footer class="site-footer">
@@ -1117,6 +1138,7 @@ def generate_index(all_proverbs):
     html = f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
+{GA_TAG}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ことわざ辞典 - 日本のことわざの意味・由来・使い方を解説</title>
